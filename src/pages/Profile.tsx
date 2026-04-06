@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, MessageSquare, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
