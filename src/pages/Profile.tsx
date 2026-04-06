@@ -68,8 +68,11 @@ const Profile = () => {
       <div className="pt-14 pb-4 px-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Profile</h1>
         <div className="flex gap-2">
-          <button className="w-10 h-10 rounded-full bg-surface-warm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-            <Settings className="w-5 h-5" />
+          <button onClick={() => navigate("/safety")} className="w-10 h-10 rounded-full bg-surface-warm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <Shield className="w-5 h-5" />
+          </button>
+          <button onClick={() => navigate("/feedback")} className="w-10 h-10 rounded-full bg-surface-warm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <MessageSquare className="w-5 h-5" />
           </button>
           <button
             onClick={signOut}
