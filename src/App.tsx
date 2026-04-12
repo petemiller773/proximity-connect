@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import SafetySettings from "./pages/SafetySettings";
 import Feedback from "./pages/Feedback";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
@@ -81,6 +82,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<PublicRoute><Auth /></PublicRoute>} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
             <Route path="/" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
             <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
