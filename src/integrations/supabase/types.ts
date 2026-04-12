@@ -131,10 +131,13 @@ export type Database = {
           display_name: string
           id: string
           instagram: string | null
+          is_profile_complete: boolean
+          is_verified: boolean
           linkedin: string | null
           twitter: string | null
           updated_at: string
           user_id: string
+          verified_at: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -144,10 +147,13 @@ export type Database = {
           display_name?: string
           id?: string
           instagram?: string | null
+          is_profile_complete?: boolean
+          is_verified?: boolean
           linkedin?: string | null
           twitter?: string | null
           updated_at?: string
           user_id: string
+          verified_at?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -157,10 +163,13 @@ export type Database = {
           display_name?: string
           id?: string
           instagram?: string | null
+          is_profile_complete?: boolean
+          is_verified?: boolean
           linkedin?: string | null
           twitter?: string | null
           updated_at?: string
           user_id?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
