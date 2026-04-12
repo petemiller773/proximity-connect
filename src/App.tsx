@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Discover from "./pages/Discover";
 import History from "./pages/History";
 import Messages from "./pages/Messages";
@@ -12,14 +14,54 @@ import Profile from "./pages/Profile";
 import SafetySettings from "./pages/SafetySettings";
 import Feedback from "./pages/Feedback";
 import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="min-h-screen bg-background" />;
+  const [profileComplete, setProfileComplete] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("is_profile_complete")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        setProfileComplete(data?.is_profile_complete ?? false);
+      });
+  }, [user]);
+
+  if (loading || (user && profileComplete === null))
+    return <div className="min-h-screen bg-background" />;
   if (!user) return <Navigate to="/auth" replace />;
+  if (!profileComplete) return <Navigate to="/onboarding" replace />;
+  return <>{children}</>;
+};
+
+const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  const [profileComplete, setProfileComplete] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("is_profile_complete")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        setProfileComplete(data?.is_profile_complete ?? false);
+      });
+  }, [user]);
+
+  if (loading || (user && profileComplete === null))
+    return <div className="min-h-screen bg-background" />;
+  if (!user) return <Navigate to="/auth" replace />;
+  if (profileComplete) return <Navigate to="/" replace />;
   return <>{children}</>;
 };
 
@@ -39,6 +81,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<PublicRoute><Auth /></PublicRoute>} />
+            <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
             <Route path="/" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
             <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
             <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />

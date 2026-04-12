@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
-import { Settings, LogOut, MessageSquare, Shield } from "lucide-react";
+import { LogOut, MessageSquare, Shield, Upload, CheckCircle, Camera } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -15,8 +15,12 @@ const Profile = () => {
   const [twitter, setTwitter] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -33,6 +37,8 @@ const Profile = () => {
           setTwitter(data.twitter || "");
           setLinkedin(data.linkedin || "");
           setDateOfBirth(data.date_of_birth || "");
+          setAvatarUrl(data.avatar_url || "");
+          setIsVerified(data.is_verified || false);
         }
         setLoaded(true);
       });
@@ -49,7 +55,6 @@ const Profile = () => {
         instagram,
         twitter,
         linkedin,
-        date_of_birth: dateOfBirth || null,
       })
       .eq("user_id", user.id);
 
@@ -59,6 +64,41 @@ const Profile = () => {
       toast.success("Profile saved!");
     }
     setSaving(false);
+  };
+
+  const handlePhotoUpload = async (file: File) => {
+    if (!user) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Photo must be under 5MB");
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatar-photos")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      toast.error("Failed to upload photo");
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("avatar-photos")
+      .getPublicUrl(path);
+
+    const publicUrl = urlData.publicUrl;
+    await supabase
+      .from("profiles")
+      .update({ avatar_url: publicUrl })
+      .eq("user_id", user.id);
+
+    setAvatarUrl(publicUrl);
+    setUploading(false);
+    toast.success("Photo updated!");
   };
 
   if (!loaded) return <div className="min-h-screen bg-background" />;
@@ -84,14 +124,48 @@ const Profile = () => {
       </div>
 
       <div className="px-6 flex flex-col items-center pt-4">
-        <div className="w-24 h-24 rounded-full bg-primary/10 border-4 border-primary/20 flex items-center justify-center overflow-hidden">
-          {user?.user_metadata?.avatar_url ? (
-            <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-4xl">👤</span>
+        {/* Avatar with upload + verified badge */}
+        <div className="relative">
+          <div
+            className="w-24 h-24 rounded-full bg-primary/10 border-4 border-primary/20 flex items-center justify-center overflow-hidden cursor-pointer"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <Camera className="w-8 h-8 text-muted-foreground" />
+            )}
+            {uploading && (
+              <div className="absolute inset-0 bg-background/60 flex items-center justify-center rounded-full">
+                <span className="text-xs font-medium text-foreground">...</span>
+              </div>
+            )}
+          </div>
+          {isVerified && (
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-green-500 flex items-center justify-center border-2 border-background">
+              <CheckCircle className="w-4 h-4 text-primary-foreground" />
+            </div>
           )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handlePhotoUpload(file);
+            }}
+          />
         </div>
         <p className="text-xs text-muted-foreground mt-2">{user?.email}</p>
+        {isVerified && (
+          <span className="text-xs font-medium text-green-600 mt-1 flex items-center gap-1">
+            <CheckCircle className="w-3 h-3" /> Verified
+          </span>
+        )}
+        {!isVerified && (
+          <p className="text-xs text-muted-foreground mt-1">Tap photo to change • Not verified</p>
+        )}
 
         <div className="w-full max-w-sm mt-6 space-y-3">
           <div className="rounded-2xl bg-surface-warm p-4">
@@ -104,7 +178,10 @@ const Profile = () => {
           </div>
           <div className="rounded-2xl bg-surface-warm p-4">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date of Birth</label>
-            <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className="mt-1 w-full bg-transparent text-foreground font-medium outline-none text-sm" />
+            <p className="mt-1 text-foreground font-medium text-sm">
+              {dateOfBirth ? new Date(dateOfBirth).toLocaleDateString() : "Not set"}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">Cannot be changed after setup</p>
           </div>
           <div className="rounded-2xl bg-surface-warm p-4">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Instagram</label>
