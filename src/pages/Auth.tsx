@@ -86,6 +86,11 @@ const Auth = () => {
             {isLogin ? "Sign Up" : "Sign In"}
           </button>
         </p>
+
+        <div className="flex gap-3 justify-center mt-6">
+          <a href="/terms" className="text-[10px] text-muted-foreground hover:text-primary underline">Terms of Service</a>
+          <a href="/privacy" className="text-[10px] text-muted-foreground hover:text-primary underline">Privacy Policy</a>
+        </div>
       </div>
     </div>
   );
