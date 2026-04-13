@@ -139,7 +139,7 @@ Respond ONLY with a JSON object (no markdown, no code fences):
     );
   } catch (e) {
     console.error("verify-selfie error:", e);
-    return new Response(JSON.stringify({ error: e.message || "Unknown error" }), {
+    return new Response(JSON.stringify({ error: (e instanceof Error ? e.message : "Unknown error") }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
