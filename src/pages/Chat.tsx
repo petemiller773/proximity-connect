@@ -68,6 +68,7 @@ const Chat = () => {
 
     if (messageCount >= FREE_MESSAGE_LIMIT) {
       toast.error("You've reached the free message limit. Upgrade to keep chatting!");
+      navigate("/upgrade");
       return;
     }
 

@@ -13,6 +13,8 @@ import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 import SafetySettings from "./pages/SafetySettings";
 import Feedback from "./pages/Feedback";
+import Notifications from "./pages/Notifications";
+import Upgrade from "./pages/Upgrade";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import Onboarding from "./pages/Onboarding";
@@ -91,6 +93,8 @@ const App = () => (
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/safety" element={<ProtectedRoute><SafetySettings /></ProtectedRoute>} />
             <Route path="/feedback" element={<ProtectedRoute><Feedback /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+            <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

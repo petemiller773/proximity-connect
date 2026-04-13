@@ -3,12 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Camera, Upload, CheckCircle, ChevronRight, Shield } from "lucide-react";
+import { Camera, Upload, CircleCheck as CheckCircle, ChevronRight, Shield, User } from "lucide-react";
+
+type Step = "profile" | "photo" | "verify" | "done";
 
 const Onboarding = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [step, setStep] = useState<"dob" | "photo" | "verify" | "done">("dob");
+  const [step, setStep] = useState<Step>("profile");
+  const [displayName, setDisplayName] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "other" | "">("");
+  const [bio, setBio] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -22,29 +28,41 @@ const Onboarding = () => {
   const calculateAge = (dob: string) => {
     const birth = new Date(dob);
     const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
+    let calculatedAge = today.getFullYear() - birth.getFullYear();
     const m = today.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-    return age;
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) calculatedAge--;
+    return calculatedAge;
   };
 
-  const handleDobSubmit = async () => {
-    if (!dateOfBirth) {
-      toast.error("Please enter your date of birth");
+  const handleProfileSubmit = async () => {
+    if (!displayName.trim()) {
+      toast.error("Please enter your name");
       return;
     }
-    const age = calculateAge(dateOfBirth);
-    if (age < 18) {
+    if (!age || parseInt(age) < 18) {
       toast.error("You must be 18 or older to use this app");
       return;
     }
+    if (!gender) {
+      toast.error("Please select your gender");
+      return;
+    }
     if (!user) return;
+
+    const dob = new Date();
+    dob.setFullYear(dob.getFullYear() - parseInt(age));
+
     const { error } = await supabase
       .from("profiles")
-      .update({ date_of_birth: dateOfBirth })
+      .update({
+        display_name: displayName.trim(),
+        date_of_birth: dob.toISOString().split("T")[0],
+        bio: bio.trim(),
+      })
       .eq("user_id", user.id);
+
     if (error) {
-      toast.error("Failed to save date of birth");
+      toast.error("Failed to save profile");
       return;
     }
     setStep("photo");
@@ -148,17 +166,16 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-8">
       <div className="w-full max-w-sm">
-        {/* Progress indicator */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          {["dob", "photo", "verify"].map((s, i) => (
+          {["profile", "photo", "verify"].map((s, i) => (
             <div
               key={s}
               className={`h-1.5 rounded-full transition-all ${
                 step === s
                   ? "w-10 bg-primary"
-                  : i < ["dob", "photo", "verify"].indexOf(step)
+                  : i < ["profile", "photo", "verify"].indexOf(step)
                   ? "w-6 bg-primary/40"
                   : "w-6 bg-muted"
               }`}
@@ -166,39 +183,75 @@ const Onboarding = () => {
           ))}
         </div>
 
-        {/* Step: Date of Birth */}
-        {step === "dob" && (
+        {step === "profile" && (
           <div className="text-center">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <Shield className="w-8 h-8 text-primary" />
+              <User className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground mb-2">Verify Your Age</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Create Your Profile</h1>
             <p className="text-sm text-muted-foreground mb-8">
-              You must be 18 or older to use Nearby. This cannot be changed later.
+              Tell us a bit about yourself to get started
             </p>
-            <div className="rounded-2xl bg-surface-warm p-4 mb-4">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Date of Birth
-              </label>
-              <input
-                type="date"
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
-                className="mt-1 w-full bg-transparent text-foreground font-medium outline-none text-sm"
-              />
+
+            <div className="space-y-4">
+              <div className="rounded-2xl bg-surface-warm p-4">
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className="w-full bg-transparent text-foreground font-medium outline-none placeholder:text-muted-foreground/50 text-sm"
+                />
+              </div>
+
+              <div className="rounded-2xl bg-surface-warm p-4">
+                <input
+                  type="number"
+                  placeholder="Age"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  min="18"
+                  max="120"
+                  className="w-full bg-transparent text-foreground font-medium outline-none placeholder:text-muted-foreground/50 text-sm"
+                />
+              </div>
+
+              <div className="rounded-2xl bg-surface-warm p-4">
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value as "male" | "female" | "other" | "")}
+                  className="w-full bg-transparent text-foreground font-medium outline-none text-sm appearance-none cursor-pointer"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div className="rounded-2xl bg-surface-warm p-4">
+                <textarea
+                  placeholder="Bio (optional)"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  maxLength={150}
+                  rows={3}
+                  className="w-full bg-transparent text-foreground font-medium outline-none placeholder:text-muted-foreground/50 text-sm resize-none"
+                />
+                <p className="text-xs text-muted-foreground mt-1">{bio.length}/150</p>
+              </div>
+
+              <button
+                onClick={handleProfileSubmit}
+                disabled={!displayName.trim() || !age || !gender}
+                className="w-full py-3.5 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/25 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                Continue <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={handleDobSubmit}
-              disabled={!dateOfBirth}
-              className="w-full py-3.5 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/25 disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              Continue <ChevronRight className="w-4 h-4" />
-            </button>
           </div>
         )}
 
-        {/* Step: Photo Upload */}
         {step === "photo" && (
           <div className="text-center">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -250,7 +303,6 @@ const Onboarding = () => {
           </div>
         )}
 
-        {/* Step: Selfie Verification */}
         {step === "verify" && (
           <div className="text-center">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">

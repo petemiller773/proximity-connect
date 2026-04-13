@@ -1,10 +1,11 @@
-import { Radar, Clock, MessageCircle, User } from "lucide-react";
+import { Radar, Clock, MessageCircle, Bell, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const tabs = [
   { path: "/", icon: Radar, label: "Discover" },
   { path: "/history", icon: Clock, label: "History" },
   { path: "/messages", icon: MessageCircle, label: "Messages" },
+  { path: "/notifications", icon: Bell, label: "Requests" },
   { path: "/profile", icon: User, label: "Profile" },
 ];
 
