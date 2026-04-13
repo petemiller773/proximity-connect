@@ -133,7 +133,10 @@ export type Database = {
           instagram: string | null
           is_profile_complete: boolean
           is_verified: boolean
+          last_location_update: string | null
+          latitude: number | null
           linkedin: string | null
+          longitude: number | null
           twitter: string | null
           updated_at: string
           user_id: string
@@ -149,7 +152,10 @@ export type Database = {
           instagram?: string | null
           is_profile_complete?: boolean
           is_verified?: boolean
+          last_location_update?: string | null
+          latitude?: number | null
           linkedin?: string | null
+          longitude?: number | null
           twitter?: string | null
           updated_at?: string
           user_id: string
@@ -165,11 +171,35 @@ export type Database = {
           instagram?: string | null
           is_profile_complete?: boolean
           is_verified?: boolean
+          last_location_update?: string | null
+          latitude?: number | null
           linkedin?: string | null
+          longitude?: number | null
           twitter?: string | null
           updated_at?: string
           user_id?: string
           verified_at?: string | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          subscription: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          subscription: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          subscription?: Json
+          user_id?: string
         }
         Relationships: []
       }
@@ -244,6 +274,25 @@ export type Database = {
       count_messages_sent: {
         Args: { p_receiver_id: string; p_sender_id: string }
         Returns: number
+      }
+      get_nearby_users: {
+        Args: {
+          p_lat: number
+          p_lng: number
+          p_radius_miles?: number
+          p_user_id: string
+        }
+        Returns: {
+          avatar_url: string
+          bio: string
+          display_name: string
+          distance_miles: number
+          is_verified: boolean
+          last_location_update: string
+          latitude: number
+          longitude: number
+          user_id: string
+        }[]
       }
     }
     Enums: {
