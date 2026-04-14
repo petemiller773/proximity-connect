@@ -9,7 +9,7 @@ const STRIPE_PUBLISHABLE_KEY = "pk_test_51TLy8LPw2hNyUA3kPMyuSbzPgjW67Uf3JJcuj9A
 
 const plans = [
   {
-    id: "weekly",
+    id: "price_1TLyEePw2hNyUA3k9sdOEUSI",
     name: "Weekly",
     price: 4.99,
     period: "week",
@@ -21,7 +21,7 @@ const plans = [
     ],
   },
   {
-    id: "monthly",
+    id: "price_1TLyF9Pw2hNyUA3kgqVNIqbU",
     name: "Monthly",
     price: 12.99,
     period: "month",
@@ -34,7 +34,7 @@ const plans = [
     ],
   },
   {
-    id: "yearly",
+    id: "price_1TLyG7Pw2hNyUA3kWNefBK9P",
     name: "Yearly",
     price: 59.99,
     period: "year",
