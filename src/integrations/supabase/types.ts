@@ -135,12 +135,14 @@ export type Database = {
           id: string
           instagram: string | null
           interests: string[] | null
+          is_premium: boolean
           is_profile_complete: boolean
           is_verified: boolean
           last_location_update: string | null
           latitude: number | null
           linkedin: string | null
           longitude: number | null
+          stripe_customer_id: string | null
           twitter: string | null
           updated_at: string
           user_id: string
@@ -155,12 +157,14 @@ export type Database = {
           id?: string
           instagram?: string | null
           interests?: string[] | null
+          is_premium?: boolean
           is_profile_complete?: boolean
           is_verified?: boolean
           last_location_update?: string | null
           latitude?: number | null
           linkedin?: string | null
           longitude?: number | null
+          stripe_customer_id?: string | null
           twitter?: string | null
           updated_at?: string
           user_id: string
@@ -175,12 +179,14 @@ export type Database = {
           id?: string
           instagram?: string | null
           interests?: string[] | null
+          is_premium?: boolean
           is_profile_complete?: boolean
           is_verified?: boolean
           last_location_update?: string | null
           latitude?: number | null
           linkedin?: string | null
           longitude?: number | null
+          stripe_customer_id?: string | null
           twitter?: string | null
           updated_at?: string
           user_id?: string
