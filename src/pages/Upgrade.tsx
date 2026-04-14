@@ -21,7 +21,7 @@ const plans = [
     ],
   },
   {
-    id: "monthly",
+    id: "price_1TLyF9Pw2hNyUA3kgqVNIqbU",
     name: "Monthly",
     price: 12.99,
     period: "month",
@@ -34,7 +34,7 @@ const plans = [
     ],
   },
   {
-    id: "yearly",
+    id: "price_1TLyG7Pw2hNyUA3kWNefBK9P",
     name: "Yearly",
     price: 59.99,
     period: "year",
