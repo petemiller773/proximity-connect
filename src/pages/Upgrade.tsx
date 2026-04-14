@@ -9,7 +9,7 @@ const STRIPE_PUBLISHABLE_KEY = "pk_test_51TLy8LPw2hNyUA3kPMyuSbzPgjW67Uf3JJcuj9A
 
 const plans = [
   {
-    id: "weekly",
+    id: "price_1TLyEePw2hNyUA3k9sdOEUSI",
     name: "Weekly",
     price: 4.99,
     period: "week",
